@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36408.4 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "zaza_gsm_web.client", "zaza_gsm_web.client\zaza_gsm_web.client.esproj", "{0DE8B043-6B9A-BD44-D1D5-67829E1EFC65}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zaza_Gsm_Web.Server", "Zaza_Gsm_Web.Server\Zaza_Gsm_Web.Server.csproj", "{9C926DB8-73A6-44F6-82C7-3A7FBCEE3926}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0DE8B043-6B9A-BD44-D1D5-67829E1EFC65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DE8B043-6B9A-BD44-D1D5-67829E1EFC65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DE8B043-6B9A-BD44-D1D5-67829E1EFC65}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{0DE8B043-6B9A-BD44-D1D5-67829E1EFC65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DE8B043-6B9A-BD44-D1D5-67829E1EFC65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DE8B043-6B9A-BD44-D1D5-67829E1EFC65}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{9C926DB8-73A6-44F6-82C7-3A7FBCEE3926}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C926DB8-73A6-44F6-82C7-3A7FBCEE3926}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C926DB8-73A6-44F6-82C7-3A7FBCEE3926}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C926DB8-73A6-44F6-82C7-3A7FBCEE3926}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {46CBF6E0-A07C-4DD0-A5FA-C476E4C6AB7E}
+	EndGlobalSection
+EndGlobal

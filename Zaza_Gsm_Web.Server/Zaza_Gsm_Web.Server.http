@@ -1,0 +1,6 @@
+@Zaza_Gsm_Web.Server_HostAddress = http://localhost:5114
+
+GET {{Zaza_Gsm_Web.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
