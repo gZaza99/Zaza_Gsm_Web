@@ -3,8 +3,8 @@ stages:
   - deploy
 
 variables:
-  FRONTEND_DIR: "C:/Users/zalan/source/repos/Zaza_Gsm_Web/zaza_gsm_web.client"
-  BACKEND_DIR: "C:/Users/zalan/source/repos/Zaza_Gsm_Web/Zaza_Gsm_Web.Server"
+  FRONTEND_DIR: "zaza_gsm_web.client"
+  BACKEND_DIR: "Zaza_Gsm_Web.Server"
   DEPLOY_DIR: "C:/ZazaGSM_WebApp"
 
 # --------------------------
@@ -36,7 +36,7 @@ build_backend:
     - echo "Build backend..."
     - cd $BACKEND_DIR
     - dotnet restore
-    - dotnet publish -c Release -o $CI_PROJECT_DIR/$BACKEND_DIR/publish
+    - dotnet publish -c Release -o publish
     - cd ..
 
 # --------------------------
