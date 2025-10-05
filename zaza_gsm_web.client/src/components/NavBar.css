@@ -1,0 +1,12 @@
+.nav-links {
+    height: 0px;
+    transition: height 300ms ease-in-out;
+    overflow: hidden;
+}
+
+.nav-item {
+    padding: 4px 12px 4px 4px;
+    box-sizing: border-box;
+    opacity: 0;
+    transition: opacity 250ms ease;
+}
