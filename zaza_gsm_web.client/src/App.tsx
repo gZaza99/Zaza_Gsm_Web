@@ -1,15 +1,22 @@
-import NavBar from './components/NavBar'
-import './App.css'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import NavBar from "./components/NavBar";
+import Clients from "./pages/clients";
+import ClientPhones from "./pages/client_phones";
+import PhoneModels from "./pages/phone_models";
 
-function App() {
+export default function App() {
   return (
-    <div>
-      <NavBar/>
-      <h1 className="text-3xl font-bold underline">
-        Tailwind projekt!
-      </h1>
-    </div>
-  )
+    <BrowserRouter>
+      <NavBar />
+      <div className="mt-4">
+        <Routes>
+          <Route path="/clients" element={<Clients />} />
+          <Route path="/client_phones" element={<ClientPhones />} />
+          <Route path="/phone_models" element={<PhoneModels />} />
+          {/* default route */}
+          <Route path="/" element={<Clients />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
+  );
 }
-
-export default App
