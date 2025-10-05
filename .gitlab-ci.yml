@@ -1,0 +1,40 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  FRONTEND_DIR: "C:/Users/zalan/source/repos/Zaza_Gsm_Web/zaza_gsm_web.client"
+  BACKEND_DIR: "C:/Users/zalan/source/repos/Zaza_Gsm_Web/Zaza_Gsm_Web.Server"
+  DEPLOY_DIR: "C:/ZazaGSM_WebApp"
+
+# --------------------------
+# React + Vite Frontend build
+# --------------------------
+build_frontend:
+  stage: build
+  tags:
+    - local
+  script:
+    - echo "Building frontend..."
+    - cd $FRONTEND_DIR
+    - npm install
+    - npm run build
+    - cd ..
+  artifacts:
+    paths:
+      - $FRONTEND_DIR/dist
+    expire_in: 1 hour
+
+# --------------------------
+# ASP.NET Backend build
+# --------------------------
+build_backend:
+  stage: build
+  tags:
+    - local
+  script:
+    - echo "Build backend..."
+    - cd $BACKEND_DIR
+    - dotnet restore
+    - dotnet publish -c Release -o $CI_PROJECT_DIR/$BACKEND_DIR/publish
+    - cd ..
