@@ -38,3 +38,16 @@ build_backend:
     - dotnet restore
     - dotnet publish -c Release -o $CI_PROJECT_DIR/$BACKEND_DIR/publish
     - cd ..
+
+# --------------------------
+# Deploy (saját gépre)
+# --------------------------
+deploy:
+  stage: deploy
+  tags:
+    - local
+  script:
+    - echo "Deploying frontend..."
+    - robocopy $FRONTEND_DIR\dist $DEPLOY_DIR\wwwroot /MIR
+    - echo "Deploying backend..."
+    - robocopy $BACKEND_DIR\publish $DEPLOY_DIR\backend /MIR
