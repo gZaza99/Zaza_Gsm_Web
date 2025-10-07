@@ -1,25 +1,26 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import type { Client } from "../interfaces/client";
+import { getClientById } from "../api/clients";
+import hexToBigInt from "../components/TypeConversion";
 
 export default function ClientDetail() {
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams();
+  const [client, setClient] = useState<Client | null>(null);
+  const [loading, setLoading] = useState(true);
 
   // A hex stringet visszaalakíthatod BIGINT-té (ha kell)
-  const numericId = parseInt(id ?? "0", 16);
+  const numericId = hexToBigInt(`0x${id}`);
 
-  const [client, setClient] = useState<Client | null>(null);
   useEffect(() => {
-    // Mock adatok — később API-ból jönnek
-    const mockClients: Client[] = [
-        { id: 10, full_name: "Kiss Péter", email: "peter.kiss@example.com", phone: "+36 30 123 4567", address: null },
-        { id: 11, full_name: "Nagy Anna", email: "anna.nagy@example.com", phone: "+36 20 987 6543", address: null },
-        { id: 12, full_name: "Szabó László", email: null, phone: "+36 70 111 2222", address: "7200 Dombóvár, Jókai Mór utca 2" },
-    ];
-
-    const found = mockClients.find((c) => c.id === numericId);
-    setClient(found ?? null);
+    getClientById(numericId)
+      .then(setClient)
+      .catch((err) => console.error(err))
+      .finally(() => setLoading(false));
   }, [numericId]);
+
+  if (loading) return <p className="text-gray-400 p-4">Betöltés...</p>;
+  if (!client) return <p className="text-red-500 p-4">Ügyfél nem található.</p>;
 
   if (client !== null)
     return (
@@ -46,8 +47,8 @@ export default function ClientDetail() {
               <label className="block text-sm text-gray-400 mb-1">Teljes név</label>
               <input
                 type="text"
-                value={client.full_name}
-                onChange={(e) => setClient({ ...client, full_name: e.target.value })}
+                value={client.fullName}
+                onChange={(e) => setClient({ ...client, fullName: e.target.value })}
                 className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-blue-600 outline-none"
               />
             </div>
@@ -57,8 +58,8 @@ export default function ClientDetail() {
               <label className="block text-sm text-gray-400 mb-1">Telefonszám</label>
               <input
                 type="text"
-                value={client.phone}
-                onChange={(e) => setClient({ ...client, phone: e.target.value })}
+                value={client.phoneNumber}
+                onChange={(e) => setClient({ ...client, phoneNumber: e.target.value })}
                 className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-blue-600 outline-none"
               />
             </div>

@@ -1,14 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Client } from "../interfaces/client";
+import { getClients } from "../api/clients";
 
 export default function Clients() {
-  // Mock adatok — később API-ból jönnek majd
-  const [clients, setClients] = useState<Client[]>([
-    { id: 10, full_name: "Kiss Péter", email: "peter.kiss@example.com", phone: "+36 30 123 4567", address: null },
-    { id: 11, full_name: "Nagy Anna", email: "anna.nagy@example.com", phone: "+36 20 987 6543", address: null },
-    { id: 12, full_name: "Szabó László", email: null, phone: "+36 70 111 2222", address: "7200 Dombóvár, Jókai Mór utca 2" },
-  ]);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getClients()
+      .then(setClients)
+      .catch((err) => console.error(err))
+      .finally(() => setLoading(false));
+  }, []);
 
   const navigate = useNavigate();
 
@@ -26,10 +30,10 @@ export default function Clients() {
           </thead>
           <tbody>
             {clients.map((client) => (
-              <tr key={client.id} className="hover:bg-[#444] transition-colors"
+              <tr key={client.id.toString()} className="hover:bg-[#444] transition-colors"
                   onClick={() => navigate(`/client/${client.id.toString(16)}`)}>
-                <td className="py-3 px-4 border-b border-gray-700">{client.full_name}</td>
-                <td className="py-3 px-4 border-b border-gray-700">{client.phone}</td>
+                <td className="py-3 px-4 border-b border-gray-700">{client.fullName}</td>
+                <td className="py-3 px-4 border-b border-gray-700">{client.phoneNumber}</td>
               </tr>
             ))}
           </tbody>
