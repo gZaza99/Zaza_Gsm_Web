@@ -53,6 +53,74 @@ BEGIN
     SELECT newId;
 END;;
 
+DROP PROCEDURE IF EXISTS `UpdateClient`;;
+CREATE PROCEDURE `UpdateClient` (`p_id` BIGINT, `p_full_name` VARCHAR(255), `p_phone_number` VARCHAR(50), `p_email` VARCHAR(255), `p_address` VARCHAR(255)) MODIFIES SQL DATA
+BEGIN 
+	START TRANSACTION;
+	UPDATE `clients`
+		SET
+			`full_name` =  `p_full_name`,
+			`phone_number` = `p_phone_number`,
+			`email` = `p_email`,
+			`address` = `p_address`
+        WHERE
+			`client_id` = `p_id`;
+	COMMIT;
+    SELECT TRUE;
+END;;
+
+DROP PROCEDURE IF EXISTS `PatchClientName`;;
+CREATE PROCEDURE `PatchClientName` (`p_id` BIGINT, `p_full_name` VARCHAR(255)) MODIFIES SQL DATA
+BEGIN 
+	START TRANSACTION;
+	UPDATE `clients`
+		SET
+			`full_name` =  `p_full_name`
+        WHERE
+			`client_id` = `p_id`;
+	COMMIT;
+    SELECT TRUE;
+END;;
+
+DROP PROCEDURE IF EXISTS `PatchClientPhoneNumber`;;
+CREATE PROCEDURE `PatchClientPhoneNumber` (`p_id` BIGINT, `p_phone_number` VARCHAR(255)) MODIFIES SQL DATA
+BEGIN 
+	START TRANSACTION;
+	UPDATE `clients`
+		SET
+			`phone_number` =  `p_phone_number`
+        WHERE
+			`client_id` = `p_id`;
+	COMMIT;
+    SELECT TRUE;
+END;;
+
+DROP PROCEDURE IF EXISTS `PatchClientEmail`;;
+CREATE PROCEDURE `PatchClientEmail` (`p_id` BIGINT, `p_email` VARCHAR(255)) MODIFIES SQL DATA
+BEGIN 
+	START TRANSACTION;
+	UPDATE `clients`
+		SET
+			`email` =  `p_email`
+        WHERE
+			`client_id` = `p_id`;
+	COMMIT;
+    SELECT TRUE;
+END;;
+
+DROP PROCEDURE IF EXISTS `PatchClientAddress`;;
+CREATE PROCEDURE `PatchClientAddress` (`p_id` BIGINT, `p_address` VARCHAR(255)) MODIFIES SQL DATA
+BEGIN 
+	START TRANSACTION;
+	UPDATE `clients`
+		SET
+			`address` =  `p_address`
+        WHERE
+			`client_id` = `p_id`;
+	COMMIT;
+    SELECT TRUE;
+END;;
+
 DROP PROCEDURE IF EXISTS `DeleteClient`;;
 CREATE PROCEDURE `DeleteClient` (`p_client_Id` BIGINT) MODIFIES SQL DATA
 BEGIN 

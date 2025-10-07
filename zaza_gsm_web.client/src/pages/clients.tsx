@@ -5,7 +5,7 @@ import { getClients } from "../api/clients";
 
 export default function Clients() {
   const [clients, setClients] = useState<Client[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [_, setLoading] = useState(true);
 
   useEffect(() => {
     getClients()
