@@ -1,8 +1,17 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import type { Client } from "../interfaces/client";
-import { getClientById } from "../api/clients";
+import {
+  getClientById, 
+  putClient,
+  patchClientName,
+  patchClientPhoneNumber,
+  patchClientEmail,
+  patchClientAddress
+} from "../api/clients";
 import hexToBigInt from "../components/TypeConversion";
+
+let originClient: Client | null;
 
 export default function ClientDetail() {
   const { id } = useParams();
@@ -14,7 +23,10 @@ export default function ClientDetail() {
 
   useEffect(() => {
     getClientById(numericId)
-      .then(setClient)
+      .then(c => {
+        setClient(c);
+        originClient = c;
+      })
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
   }, [numericId]);
@@ -90,9 +102,9 @@ export default function ClientDetail() {
             <div className="flex justify-end space-x-4 pt-4">
               <button
                 type="submit"
-                onClick={(e) => {
+                onClick={e => {
                   e.preventDefault();
-                  alert("Mentés még nem implementált 🙂");
+                  onSavePressed(client);
                 }}
                 className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg grow"
               >
@@ -103,4 +115,55 @@ export default function ClientDetail() {
         </div>
       </div>
     );
+}
+
+function onSavePressed(client: Client)
+{
+  let changed: string[] = [];
+
+  if(client.email   === "") client.email = null;
+  if(client.address === "") client.address = null;
+
+  if(client.fullName    !== originClient?.fullName   ) changed.push("full_name");
+  if(client.phoneNumber !== originClient?.phoneNumber) changed.push("phone_number");
+  if(client.email       !== originClient?.email      ) changed.push("email");
+  if(client.address     !== originClient?.address    ) changed.push("address");
+
+  if (changed.length === 0) return;
+
+  if (changed.length > 2) // 1 PUT request if more than 2
+  {
+    putClient(client)
+      .then((ok) => {
+        if (ok) alert("Sikeres mentés!");
+        else alert("Nem sikerült a mentés!");
+      })
+      .catch((err) => console.error(err));
+  } else { // A few PATCH requests if not more than 2
+const promises: Promise<boolean>[] = [];
+
+    for (const field of changed) {
+      switch (field) {
+        case "full_name":
+          promises.push(patchClientName(client.id, client.fullName));
+          break;
+        case "phone_number":
+          promises.push(patchClientPhoneNumber(client.id, client.phoneNumber));
+          break;
+        case "email":
+          promises.push(patchClientEmail(client.id, client.email));
+          break;
+        case "address":
+          promises.push(patchClientAddress(client.id, client.address));
+          break;
+      }
+    }
+
+    Promise.all(promises)
+      .then((results) => {
+        if (results.every((success) => success === true)) alert("Sikeres mentés!");
+        else alert("Egyes módosításokat nem sikerültek elmenteni!");
+      })
+      .catch((err) => console.error(err));
+  }
 }
