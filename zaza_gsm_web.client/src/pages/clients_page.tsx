@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import type { Client } from "../interfaces/client";
-import { getClients } from "../api/clients";
+import type { IClient } from "../interfaces/iclient";
+import { getClients } from "../api/clientsApi";
 
 export default function Clients() {
-  const [clients, setClients] = useState<Client[]>([]);
+  const [clients, setClients] = useState<IClient[]>([]);
   const [_, setLoading] = useState(true);
 
   useEffect(() => {

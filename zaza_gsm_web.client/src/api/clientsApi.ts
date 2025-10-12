@@ -1,8 +1,8 @@
-import type { Client } from "../interfaces/client";
+import type { IClient } from "../interfaces/iclient";
 
 const API_BASE_URL = "https://localhost:7105";
 
-export async function getClients(): Promise<Client[]> {
+export async function getClients(): Promise<IClient[]> {
   const response = await fetch(`${API_BASE_URL}/Client`);
   if (!response.ok) {
     throw new Error("Failed to fetch clients");
@@ -18,7 +18,7 @@ export async function getClients(): Promise<Client[]> {
   return map;
 }
 
-export async function getClientById(p_id: bigint): Promise<Client> {
+export async function getClientById(p_id: bigint): Promise<IClient> {
   const response = await fetch(`${API_BASE_URL}/Client/${p_id}`);
   const data = await response.json();
   
@@ -28,11 +28,11 @@ export async function getClientById(p_id: bigint): Promise<Client> {
     phoneNumber: data.phoneNumber,
     email: data.email,
     address: data.address
-  } as Client;
+  } as IClient;
   return client;
 }
 
-export async function addClient(client: Omit<Client, "id">): Promise<number> {
+export async function addClient(client: Omit<IClient, "id">): Promise<number> {
   const params = new URLSearchParams({
     fullName: client.fullName,
     phoneNumber: client.phoneNumber,
@@ -48,7 +48,7 @@ export async function addClient(client: Omit<Client, "id">): Promise<number> {
   return response.json();
 }
 
-export async function putClient(client: Client): Promise<boolean>{
+export async function putClient(client: IClient): Promise<boolean>{
   const params = new URLSearchParams({
     id: client.id.toString(),
     fullName: client.fullName,

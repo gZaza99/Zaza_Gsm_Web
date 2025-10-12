@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import type { Client } from "../interfaces/client";
+import type { IClient } from "../interfaces/iclient";
 import {
   getClientById, 
   putClient,
@@ -8,14 +8,14 @@ import {
   patchClientPhoneNumber,
   patchClientEmail,
   patchClientAddress
-} from "../api/clients";
+} from "../api/clientsApi";
 import hexToBigInt from "../components/TypeConversion";
 
-let originClient: Client | null;
+let originClient: IClient | null;
 
 export default function ClientDetail() {
   const { id } = useParams();
-  const [client, setClient] = useState<Client | null>(null);
+  const [client, setClient] = useState<IClient | null>(null);
   const [loading, setLoading] = useState(true);
 
   // A hex stringet visszaalakíthatod BIGINT-té (ha kell)
@@ -117,7 +117,7 @@ export default function ClientDetail() {
     );
 }
 
-function onSavePressed(client: Client)
+function onSavePressed(client: IClient)
 {
   let changed: string[] = [];
 

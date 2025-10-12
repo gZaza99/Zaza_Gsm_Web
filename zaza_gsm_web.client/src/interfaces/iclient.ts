@@ -1,4 +1,4 @@
-export interface Client {
+export interface IClient {
   id: bigint;
   fullName: string;
   phoneNumber: string;
