@@ -137,4 +137,31 @@ BEGIN
     END IF;
 END;;
 
+DROP PROCEDURE IF EXISTS `GetClientsState`;;
+CREATE PROCEDURE `GetClientsState` () READS SQL DATA
+BEGIN 
+    SELECT `hash` FROM `table_state` WHERE `name` = 'clients' LIMIT 1;
+END;;
+
+DROP PROCEDURE IF EXISTS `UpdateClientsState`;;
+CREATE PROCEDURE `UpdateClientsState` () MODIFIES SQL DATA
+BEGIN
+	DECLARE `combined_text` LONGTEXT;
+
+    SELECT GROUP_CONCAT(
+        CONCAT(
+            '{',
+            `client_id`, ';',
+            `full_name`, ';',
+            `phone_number`, ';',
+            COALESCE(`email`, ''), ';',
+            COALESCE(`address`, ''),
+            '}'
+        ) SEPARATOR '\n'
+    ) INTO `combined_text`
+    FROM `clients`;
+
+    UPDATE `table_state` SET `hash` = MD5(`combined_text`) WHERE `name` = 'clients';
+END;;
+
 DELIMITER ;
