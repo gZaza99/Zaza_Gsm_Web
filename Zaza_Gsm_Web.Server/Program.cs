@@ -29,32 +29,40 @@ namespace Zaza_Gsm_Web.Server
         {
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-            // INI konfiguráció betöltése (settings.ini)
-            builder.Configuration
-                .SetBasePath(AppContext.BaseDirectory)
-                .AddIniFile("settings.ini", optional: true, reloadOnChange: true);
-
-            IConfigurationSection config = builder.Configuration.GetSection("Server");
-
-            // Port beolvasása a konfigurációból
-            string portSetting = config["Port"] ?? "5000";
-            int[] ports = portSetting
-                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .Select(p => int.Parse(p))
-                .ToArray();
-
-            ports = FreePortIn(ports);
-
-            builder.WebHost.UseUrls(ports.Select(p => $"http://localhost:{p}").ToArray());
-
             // CORS POLICY REGISZTRÁLÁSA
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowFrontend", policy =>
-                    policy.WithOrigins("http://localhost:5173", "https://localhost:7105", "http://localhost:5114")
+                    policy.WithOrigins("https://localhost:5173",
+                                       "https://localhost:5174",
+                                       "http://localhost:5173",
+                                       "http://localhost:5174")
                           .AllowAnyHeader()
                           .AllowAnyMethod());
             });
+
+            int[] ports = { 5000, 5001 };
+            bool portsAreFree = false;
+            do
+            {
+                int[] freePorts = FreePortIn(ports);
+                portsAreFree = freePorts.Contains(ports[0]) && freePorts.Contains(ports[1]);
+
+                if (portsAreFree)
+                {
+                    // Setting up to HTTP and HTTPS
+                    builder.WebHost.ConfigureKestrel(options =>
+                    {
+                        options.ListenLocalhost(freePorts[0]); // HTTP
+                        options.ListenLocalhost(freePorts[1], listenOptions => listenOptions.UseHttps()); // HTTPS
+                    });
+                }
+                else
+                {
+                    ports[0] += 2;
+                    ports[1] += 2;
+                }
+            } while (!portsAreFree);
 
             // Add services to the container.
             builder.Services.AddControllers()

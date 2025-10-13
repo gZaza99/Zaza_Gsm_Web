@@ -1,6 +1,6 @@
 import type { IClient } from "../interfaces/iclient";
 
-const API_BASE_URL = "https://localhost:7105";
+const API_BASE_URL = "https://localhost:5001";
 
 export async function getClients(): Promise<IClient[]> {
   const response = await fetch(`${API_BASE_URL}/Client`);
