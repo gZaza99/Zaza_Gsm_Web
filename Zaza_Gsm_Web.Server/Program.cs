@@ -1,51 +1,105 @@
 using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
+using Zaza_Gsm_Web.Server.Services;
+using System.Net;
+using System.Net.Sockets;
+using Zaza_Gsm_Web.Server.Model;
+
 namespace Zaza_Gsm_Web.Server
 {
     class Program
     {
-        private static int[] FreePortIn(int[] ports)
+        private static bool PortIsAvailable(int port)
         {
-            int[] freePorts = ports.Where(p =>
+            try
             {
-                try
-                {
-                    // Ellenõrizzük, hogy a port szabad-e
-                    using var listener = new System.Net.Sockets.TcpListener(System.Net.IPAddress.Loopback, p);
-                    listener.Start();
-                    listener.Stop();
-                    return true;
-                }
-                catch
-                {
-                    return false;
-                }
-            }).ToArray();
+                TcpListener listener = new(IPAddress.Loopback, port);
+                listener.Start();
+                listener.Stop();
+                return true;
+            }
+            catch (SocketException)
+            {
+                return false;
+            }
+        }
+
+#if DEBUG
+        private static int[] FreePortsIn(int[] ports)
+        {
+            int[] freePorts = ports.Where(PortIsAvailable).ToArray();
 
             return freePorts;
         }
+#else
+        private static int[] FreePortsIn(int[] ports)
+            => ports.Where(PortIsAvailable).ToArray();
+#endif
 
         public static void Main(string[] args)
         {
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-            // CORS POLICY REGISZTRÁLÁSA
+            string iniPath = Path.Combine(builder.Environment.ContentRootPath, "settings.ini");
+            builder.Configuration.AddIniFile(iniPath, false, true);
+
+            IEnumerable<KeyValuePair<string, string?>> configValues
+                = builder.Configuration.AsEnumerable().Where(t => t.Value is not null);
+
+            foreach ((string key, string? value) in configValues)
+            {
+                switch (key)
+                {
+                    case "ServerLaunch:HttpPort":
+                        Config.ServerLaunch.HttpPort = int.Parse(value!);
+                        break;
+                    case "ServerLaunch:HttpsPort":
+                        Config.ServerLaunch.HttpsPort = int.Parse(value!);
+                        break;
+                    case "Database:User":
+                        Config.Database.User = value!;
+                        break;
+                    case "Database:Server":
+                        Config.Database.Server = value!;
+                        break;
+                    case "Database:Port":
+                        Config.Database.Port = int.Parse(value!);
+                        break;
+                    case "Database:Password":
+                        Config.Database.Password = value!;
+                        break;
+                    case "Database:Database":
+                        Config.Database.DbName = value!;
+                        break;
+                    case "Database:Timeout":
+                        Config.Database.Timeout = int.Parse(value!);
+                        break;
+                }
+            }
+
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowFrontend", policy =>
-                    policy.WithOrigins("https://localhost:5173",
-                                       "https://localhost:5174",
-                                       "http://localhost:5173",
-                                       "http://localhost:5174")
+                    policy.WithOrigins("https://localhost:5173", // HTTPS-Dev 1
+                                       "https://localhost:5174", // HTTPS-Dev 2
+                                       "http://localhost:5173" , // HTTP-Dev 1
+                                       "http://localhost:5174" , // HTTP-Dev 2
+                                       "https://localhost:4173", // HTTPS-Prod 1
+                                       "https://localhost:4174", // HTTPS-Prod 2
+                                       "http://localhost:4173" , // HTTP-Prod 1
+                                       "http://localhost:4174" ) // HTTP-Prod 2
                           .AllowAnyHeader()
                           .AllowAnyMethod());
             });
 
-            int[] ports = { 5000, 5001 };
+            int[] ports =
+            {
+                Config.ServerLaunch.HttpPort,
+                Config.ServerLaunch.HttpsPort
+            };
             bool portsAreFree = false;
             do
             {
-                int[] freePorts = FreePortIn(ports);
+                int[] freePorts = FreePortsIn(ports);
                 portsAreFree = freePorts.Contains(ports[0]) && freePorts.Contains(ports[1]);
 
                 if (portsAreFree)
@@ -83,10 +137,9 @@ namespace Zaza_Gsm_Web.Server
 
             WebApplication app = builder.Build();
 
-            // CORS ENGEDÉLYEZÉSE
             app.UseCors("AllowFrontend");
 
-            // A többi middleware sorrend fontos:
+            // The order of middleware is important
             app.UseRouting();
             app.UseAuthorization();
 

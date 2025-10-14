@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Zaza_Gsm_Web.Server.Model;
 using MySqlConnector;
+using Zaza_Gsm_Web.Server.Services;
 
 namespace Zaza_Gsm_Web.Server.Controllers
 {
@@ -13,16 +14,15 @@ namespace Zaza_Gsm_Web.Server.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<Client> Get()
-            => _cache.GetClients();
+        public async Task<List<Client>> Get()
+            => await Task.Run(() => _cache.GetClients());
 
         [HttpGet("{id:long}")]
-        public Client? Get(long id)
-            => _cache.GetClients().FirstOrDefault(temp_client => temp_client.Id == id);
+        public async Task<Client?> Get(long id)
+            => await Task.Run(() => _cache.GetClients().FirstOrDefault(temp_client => temp_client.Id == id));
 
-        /// <summary>Saves a new client to the database and returns the new client's ID.</summary>
         [HttpPost]
-        public long Post(string fullName, string phoneNumber, string? email, string? address)
+        public async Task<long> Post(string fullName, string phoneNumber, string? email, string? address)
         {
             long newId;
             try
@@ -41,13 +41,14 @@ namespace Zaza_Gsm_Web.Server.Controllers
                 _logger.LogError("Database connection error: " + ex.Message);
                 newId = -1;
             }
-            return newId;
+            return await Task.FromResult(newId);
         }
 
         [HttpPut]
-        public bool Put(long id, string fullName, string phoneNumber, string? email, string? address)
+        public async Task<bool> Put(long id, string fullName, string phoneNumber, string? email, string? address)
         {
             bool success;
+            string errorMessage = string.Empty;
             try
             {
                 SqlConnection.Open();
@@ -64,20 +65,20 @@ namespace Zaza_Gsm_Web.Server.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError("Database connection error: " + ex.Message);
+                errorMessage += "Database connection error: " + ex.Message;
                 success = false;
             }
             if (!success)
-            {
-                _logger.LogError("Client update failed.");
-            }
-            return success;
+                _logger.LogError("Client update failed:" + errorMessage);
+
+            return await Task.FromResult(success);
         }
 
         [HttpPatch("full_name")]
-        public bool SetName(long id, string fullName)
+        public async Task<bool> SetName(long id, string fullName)
         {
             bool success;
+            string errorMessage = string.Empty;
             try
             {
                 SqlConnection.Open();
@@ -92,20 +93,21 @@ namespace Zaza_Gsm_Web.Server.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError("Database connection error: " + ex.Message);
+                errorMessage += "Database connection error: " + ex.Message;
                 success = false;
             }
             if (!success)
             {
-                _logger.LogError("Client name update failed.");
+                _logger.LogError("Client name update failed: " + errorMessage);
             }
-            return success;
+            return await Task.FromResult(success);
         }
 
         [HttpPatch("phone_number")]
-        public bool SetPhoneNumber(long id, string phoneNumber)
+        public async Task<bool> SetPhoneNumber(long id, string phoneNumber)
         {
             bool success;
+            string errorMessage = string.Empty;
             try
             {
                 SqlConnection.Open();
@@ -120,20 +122,21 @@ namespace Zaza_Gsm_Web.Server.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError("Database connection error: " + ex.Message);
+                errorMessage += "Database connection error: " + ex.Message;
                 success = false;
             }
             if (!success)
             {
-                _logger.LogError("Client phone number update failed.");
+                _logger.LogError("Client phone number update failed: " + errorMessage);
             }
-            return success;
+            return await Task.FromResult(success);
         }
 
         [HttpPatch("email")]
-        public bool SetEmail(long id, string? email)
+        public async Task<bool> SetEmail(long id, string? email)
         {
             bool success;
+            string errorMessage = string.Empty;
             try
             {
                 SqlConnection.Open();
@@ -149,20 +152,21 @@ namespace Zaza_Gsm_Web.Server.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError("Database connection error: " + ex.Message);
+                errorMessage += "Database connection error: " + ex.Message;
                 success = false;
             }
             if (!success)
             {
-                _logger.LogError("Client email update failed.");
+                _logger.LogError("Client email update failed: " + errorMessage);
             }
-            return success;
+            return await Task.FromResult(success);
         }
 
         [HttpPatch("address")]
-        public bool SetAddress(long id, string? address)
+        public async Task<bool> SetAddress(long id, string? address)
         {
             bool success;
+            string errorMessage = string.Empty;
             try
             {
                 SqlConnection.Open();
@@ -178,21 +182,21 @@ namespace Zaza_Gsm_Web.Server.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError("Database connection error: " + ex.Message);
+                errorMessage += "Database connection error: " + ex.Message;
                 success = false;
             }
             if (!success)
             {
-                _logger.LogError("Client address update failed.");
+                _logger.LogError("Client address update failed: " + errorMessage);
             }
-            return success;
+            return await Task.FromResult(success);
         }
 
-        /// <summary>Deletes a client from the database by ID, and returns true if successful, false otherwise.</summary>
         [HttpDelete]
-        public bool Delete(long id)
+        public async Task<bool> Delete(long id)
         {
             bool success;
+            string errorMessage = string.Empty;
             try
             {
                 SqlConnection.Open();
@@ -204,14 +208,14 @@ namespace Zaza_Gsm_Web.Server.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError("Database connection error: " + ex.Message);
+                errorMessage += "Database connection error: " + ex.Message;
                 success = false;
             }
             if (!success)
             {
-                _logger.LogError("Client deletion failed.");
+                _logger.LogError("Client deletion failed: " + errorMessage);
             }
-            return success;
+            return await Task.FromResult(success);
         }
     }
 }
