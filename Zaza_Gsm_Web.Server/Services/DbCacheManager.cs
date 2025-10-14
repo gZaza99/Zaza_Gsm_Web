@@ -74,6 +74,20 @@ namespace Zaza_Gsm_Web.Server.Services
         public List<Client> GetClients() =>
             _cache.TryGetValue("clients", out object? data) ? (List<Client>)data : [];
 
+        public bool InvalidateClientsCache()
+        {
+            try
+            {
+                LoadClients();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Hiba történt a clients cache érvénytelenítése során.");
+                return false;
+            }
+        }
+
         public Task StopAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("DatabaseCacheManager stopped.");

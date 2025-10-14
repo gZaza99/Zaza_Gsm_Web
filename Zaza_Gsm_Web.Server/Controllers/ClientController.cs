@@ -35,6 +35,7 @@ namespace Zaza_Gsm_Web.Server.Controllers
                 newId = (long)cmd.ExecuteScalar()!;
 
                 SqlConnection.Close();
+                _cache.InvalidateClientsCache();
             }
             catch (Exception ex)
             {
@@ -62,6 +63,7 @@ namespace Zaza_Gsm_Web.Server.Controllers
                 success = (long)cmd.ExecuteScalar()! == 1;
 #endif
                 SqlConnection.Close();
+                _cache.InvalidateClientsCache();
             }
             catch (Exception ex)
             {
@@ -90,6 +92,7 @@ namespace Zaza_Gsm_Web.Server.Controllers
                 success = (long)cmd.ExecuteScalar()! == 1;
 #endif
                 SqlConnection.Close();
+                _cache.InvalidateClientsCache();
             }
             catch (Exception ex)
             {
@@ -119,6 +122,7 @@ namespace Zaza_Gsm_Web.Server.Controllers
                 success = (long)cmd.ExecuteScalar()! == 1;
 #endif
                 SqlConnection.Close();
+                _cache.InvalidateClientsCache();
             }
             catch (Exception ex)
             {
@@ -149,6 +153,7 @@ namespace Zaza_Gsm_Web.Server.Controllers
                 success = (long)cmd.ExecuteScalar()! == 1;
 #endif
                 SqlConnection.Close();
+                _cache.InvalidateClientsCache();
             }
             catch (Exception ex)
             {
@@ -179,6 +184,7 @@ namespace Zaza_Gsm_Web.Server.Controllers
                 success = (long)cmd.ExecuteScalar()! == 1;
 #endif
                 SqlConnection.Close();
+                _cache.InvalidateClientsCache();
             }
             catch (Exception ex)
             {
@@ -205,6 +211,7 @@ namespace Zaza_Gsm_Web.Server.Controllers
                 success = (long)cmd.ExecuteScalar()! == 1;
 
                 SqlConnection.Close();
+                _cache.InvalidateClientsCache();
             }
             catch (Exception ex)
             {

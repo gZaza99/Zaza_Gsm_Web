@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, type NavigateFunction } from "react-router-dom";
 import { useEffect, useState } from "react";
 import type { IClient } from "../interfaces/iclient";
 import {
@@ -7,16 +7,19 @@ import {
   patchClientName,
   patchClientPhoneNumber,
   patchClientEmail,
-  patchClientAddress
+  patchClientAddress,
+  deleteClient
 } from "../api/clientsApi";
 import hexToBigInt from "../components/TypeConversion";
 
 let originClient: IClient | null;
+let navigate: NavigateFunction;
 
 export default function ClientDetail() {
   const { id } = useParams();
   const [client, setClient] = useState<IClient | null>(null);
   const [loading, setLoading] = useState(true);
+  navigate = useNavigate();
 
   // A hex stringet visszaalakíthatod BIGINT-té (ha kell)
   const numericId = hexToBigInt(`0x${id}`);
@@ -104,6 +107,16 @@ export default function ClientDetail() {
                 type="submit"
                 onClick={e => {
                   e.preventDefault();
+                  onDeletePressed(client);
+                }}
+                className="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg grow"
+              >
+                Törlés
+              </button>
+              <button
+                type="submit"
+                onClick={e => {
+                  e.preventDefault();
                   onSavePressed(client);
                 }}
                 className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg grow"
@@ -120,6 +133,18 @@ export default function ClientDetail() {
 function onSavePressed(client: IClient)
 {
   let changed: string[] = [];
+  let message: string = "";
+
+  if(client.fullName === "" || client.fullName === "" || client.fullName === undefined)
+    message += "Teljes név megadása kötelező.";
+  if(client.phoneNumber == "" || client.phoneNumber == null || client.phoneNumber == undefined)
+    message += "Telefonszám megadása kötelező. ";
+
+  if(message !== "")
+  {
+    alert(message);
+    return;
+  }
 
   if(client.email   === "") client.email = null;
   if(client.address === "") client.address = null;
@@ -140,7 +165,7 @@ function onSavePressed(client: IClient)
       })
       .catch((err) => console.error(err));
   } else { // A few PATCH requests if not more than 2
-const promises: Promise<boolean>[] = [];
+    const promises: Promise<boolean>[] = [];
 
     for (const field of changed) {
       switch (field) {
@@ -161,9 +186,19 @@ const promises: Promise<boolean>[] = [];
 
     Promise.all(promises)
       .then((results) => {
-        if (results.every((success) => success === true)) alert("Sikeres mentés!");
+        if (results.every((success) => success === true)) alert("Sikeres mentés!"); // Todo: Frissüljön
         else alert("Egyes módosításokat nem sikerültek elmenteni!");
       })
       .catch((err) => console.error(err));
   }
+}
+
+function onDeletePressed(client: IClient) {
+  deleteClient(client.id)
+    .then(success => {
+      if (success)
+        navigate("/clients/")
+      else
+        console.log(success);
+    });
 }

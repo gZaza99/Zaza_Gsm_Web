@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { IClient } from "../interfaces/iclient";
 import { getClients } from "../api/clientsApi";
+import AddIcon from "../assets/plus.svg";
 
 export default function Clients() {
   const [clients, setClients] = useState<IClient[]>([]);
@@ -18,9 +19,13 @@ export default function Clients() {
 
   return (
     <div className="p-2">
-      <h1 className="text-2xl font-bold mb-4">Ügyfelek</h1>
+      <h1 className="text-2xl font-bold mb-4 float-left">Ügyfelek</h1>
+      <button className="bg-[#333] float-right rounded-lg"
+      onClick={() => navigate(`/newclient/`)}>
+        <img src={AddIcon} className="w-10 overflow-hidden"/>
+      </button>
 
-      <div className="overflow-x-auto rounded-lg shadow-md">
+      <div className="overflow-x-auto rounded-lg shadow-md clear-both">
         <table className="min-w-full border border-gray-700 bg-[#222] text-white">
           <thead className="bg-[#333] text-gray-200">
             <tr>
