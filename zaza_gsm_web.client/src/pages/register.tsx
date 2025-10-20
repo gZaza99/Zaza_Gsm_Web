@@ -1,5 +1,8 @@
 import { useState } from "react";
 import type { IUser } from "../interfaces/iuser";
+import {
+    runChecksAndShowErrors
+} from "../components/common"
 
 export default function Register() {
     const newUsr: IUser = {
@@ -81,7 +84,12 @@ export default function Register() {
                         type="submit"
                         onClick={e => {
                             e.preventDefault();
-                            checkRequirementsAndShowErrors(userName, email, password, confPassword);
+                            runChecksAndShowErrors(
+                                () => checkUsername(userName),
+                                () => checkEmail(email),
+                                () => checkPassword(password),
+                                () => checkConfPassword(password, confPassword)
+                            );
                         }}
                         className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg grow"
                         >
@@ -99,20 +107,23 @@ export default function Register() {
     );
 }
 
-function checkRequirementsAndShowErrors(userName: string, email: string, password: string, passwordConf: string) {
-    // Todo: Replace "burned in" comparison values ("MrZalan", "zalan.gal.99@gmail.com") to API requests
-
+function checkUsername(userName: string): [HTMLDivElement, string] | [HTMLDivElement, string[]] | HTMLDivElement
+{
     // Check username is free.
     let userNameSection = document.getElementById("userNameSection") as HTMLDivElement;
     if (userName === "MrZalan")
-        handleErrorMessageIn(userNameSection, "Foglalt a felhasználónév.");
+        return [userNameSection, "Foglalt a felhasználónév."];
     else
-        handleErrorMessageIn(userNameSection);
+        return userNameSection;
+}
 
+function checkEmail(email: string): [HTMLDivElement, string] | [HTMLDivElement, string[]] | HTMLDivElement
+{
     let emailMessage: string[] = [];
+    let emailSection = document.getElementById("emailSection") as HTMLDivElement;
     // Check if eamil is empty
     if (email === "")
-        emailMessage.push("Email címmel kitöltése kötelező.");
+        return [emailSection, "Email címmel kitöltése kötelező."];
     
     // Check email is free.
     if (email === "zalan.gal.99@gmail.com")
@@ -122,109 +133,60 @@ function checkRequirementsAndShowErrors(userName: string, email: string, passwor
     let pattern: RegExp = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
     if (!pattern.test(email))
         emailMessage.push("Nem felel meg az email követelményének.");
-    
-    let emailSection = document.getElementById("emailSection") as HTMLDivElement;
-    if (emailMessage.length != 0) {
-        handleErrorMessagesIn(emailSection, emailMessage);
-    } else {
-        handleErrorMessageIn(emailSection);
-    }
 
+    if (emailMessage.length == 0)
+        return emailSection;
+    else if (emailMessage.length == 1)
+        return [emailSection, emailMessage[0]];
+    else
+        return [emailSection, emailMessage];
+}
+
+function checkPassword(password: string): [HTMLDivElement, string] | [HTMLDivElement, string[]] | HTMLDivElement {
     let passwordMessages: string[] = [];
+    let passwordSection = document.getElementById("passwordSection") as HTMLDivElement;
     // Check if password is empty
     if (password == "")
-        passwordMessages.push("Jelszó kitöltése kötelező!");
+        return [passwordSection, "Jelszó kitöltése kötelező!"];
     
     // Check password requirement.
-    pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{5,}$/;
+    const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{5,}$/;
     if (!pattern.test(password))
-        passwordMessages.push("Nem felel meg a jelszó követelményének.");
+    {
+        let msg: string[] = [
+            "Nem felel meg a jelszó követelményének.",
+            "Az alábbiaknak kell teljesülnia:",
+            " - Legalább 1 kis latin betű (a-z)",
+            " - Legalább 1 nagy latin betű (A-Z)",
+            " - Legalább 1 szám",
+            " - Legalább 5 karakter"
+        ];
+        return [passwordSection, msg.reverse()];
+    }
     
-    let passwordSection = document.getElementById("passwordSection") as HTMLDivElement;
-    if (passwordMessages.length != 0)
-        handleErrorMessagesIn(passwordSection, passwordMessages);
+    if (passwordMessages.length == 0)
+        return passwordSection;
+    else if (passwordMessages.length == 1)
+        return [passwordSection, passwordMessages[0]];
     else
-        handleErrorMessageIn(passwordSection);
+        return [passwordSection, passwordMessages];
+}
 
+function checkConfPassword(password: string, confPassword: string): [HTMLDivElement, string] | [HTMLDivElement, string[]] | HTMLDivElement {
     let confPassMessages: string[] = [];
+    let confPasswordSection = document.getElementById("confPasswordSection") as HTMLDivElement;
     // Check if confirmation password is empty.
-    if (passwordConf == "")
-        confPassMessages.push("Megerősítő jelszó kitöltése kötelező.");
+    if (confPassword == "")
+        return [confPasswordSection, "Megerősítő jelszó kitöltése kötelező."];
 
     // Check confirmation password.
-    if (password !== passwordConf)
+    if (password !== confPassword)
         confPassMessages.push("Nem egyezik meg a 2 jelszó.");
     
-    let confPasswordSection = document.getElementById("confPasswordSection") as HTMLDivElement;
-    if (confPassMessages.length != 0)
-        handleErrorMessagesIn(confPasswordSection, confPassMessages);
+    if (confPassMessages.length == 0)
+        return confPasswordSection;
+    else if (confPassMessages.length == 1)
+        return [confPasswordSection, confPassMessages[0]];
     else
-        handleErrorMessageIn(confPasswordSection);
-}
-
-function handleErrorMessageIn(section: HTMLDivElement, ... message: string[]) {
-    handleErrorMessagesIn(section, message);
-}
-function handleErrorMessagesIn(section: HTMLDivElement, message: string[]): void {
-    // Hide and destroy old messages
-    const messages = section.querySelectorAll(".errorMessage") as NodeListOf<HTMLParagraphElement>;
-    messages.forEach(msg => {
-        hideErrorMessage(msg);
-        setTimeout(() => {
-            section.removeChild(msg);
-        }, 500);
-    });
-
-    // Create and show new messages
-    let delay = (messages.length == 0) ? 0 : 500;
-    setTimeout(() => {
-        message.forEach(msg => {
-            const newP = document.createElement("p");
-            newP.className = "errorMessage transition-[height,opacity] duration-500 h-0 opacity-0 hidden text-sm text-red-500";
-            newP.textContent = msg;
-            section.insertBefore(newP, section.firstChild);
-            showErrorMessage(newP);
-        });
-    }, delay);
-}
-
-function showErrorMessage(messageElement: HTMLParagraphElement): void {
-    const section = messageElement.parentElement as HTMLDivElement;
-    if (section === null)
-    {
-        console.debug(`section is null in showErrorMessage(${messageElement})`);
-        return;
-    }
-    // originalMessageElements already contains the argument messageElement.
-    const originalMessageElements = section.querySelectorAll(".errorMessage") as NodeListOf<HTMLParagraphElement>;
-    const originalHeight = 66 + (originalMessageElements.length - 1) * 20;
-    const nextHeight = originalHeight + 20;
-    
-    messageElement.classList.remove("hidden");
-    void messageElement.offsetHeight; // Force reflow
-    requestAnimationFrame(() => {
-        section.classList.replace(`h-[${originalHeight}px]`, `h-[${nextHeight}px]`);
-        messageElement.classList.replace("h-0", "h-[20px]");
-        messageElement.classList.replace("opacity-0", "opacity-100");
-    });
-}
-
-function hideErrorMessage(messageElement: HTMLParagraphElement): void {
-    const section = messageElement.parentElement as HTMLDivElement;
-    
-    if (section === null)
-    {
-        console.debug(`section is null in hideErrorMessage(${messageElement})`);
-        return;
-    }
-    const originalMessageElements = section.querySelectorAll(".errorMessage") as NodeListOf<HTMLParagraphElement>;
-    const originalHeight = 66 + originalMessageElements.length * 20;
-    const nextHeight = originalHeight - 20;
-
-    messageElement.classList.replace(`h-[20px]`, `h-0`);
-    messageElement.classList.replace("opacity-100", "opacity-0");
-    setTimeout(() => {
-        section.classList.replace(`h-[${originalHeight}px]`, `h-[${nextHeight}px]`);
-        messageElement.classList.add("hidden");
-    }, 500);
+        return [confPasswordSection, confPassMessages];
 }
