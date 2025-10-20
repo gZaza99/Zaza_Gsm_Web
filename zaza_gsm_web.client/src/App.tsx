@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import NavBar from "./components/NavBar";
+import Login from "./pages/login";
+import Register from "./pages/register";
 import Clients from "./pages/clients_page";
 import ClientDetail from "./pages/client_details_page";
 import ClientPhones from "./pages/client_phones_page";
@@ -12,13 +14,15 @@ export default function App() {
       <NavBar />
       <div className="mt-4">
         <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/clients" element={<Clients />} />
           <Route path="/client/:id" element={<ClientDetail />} />
           <Route path="/newclient/" element={<AddClient />}/>
           <Route path="/client_phones" element={<ClientPhones />} />
           <Route path="/phone_models" element={<PhoneModels />} />
           {/* default route */}
-          <Route path="/" element={<Clients />} />
+          <Route path="/" element={<Login />} />
         </Routes>
       </div>
     </BrowserRouter>
